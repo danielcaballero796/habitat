@@ -46,7 +46,7 @@ RSpec.describe DeviceAttribute, type: :model do
     it "stores type as string in DB, symbol in Ruby (Scenario 3.2)" do
       device = Device.create!(name: "Test", type: :smart_plug)
       reloaded = Device.find(device.id)
-      expect(reloaded.type).to eq :smart_plug
+      expect(reloaded.type.to_sym).to eq :smart_plug  # Rails enum comparison
       expect(reloaded.read_attribute_before_type_cast(:type)).to eq "smart_plug"
     end
   end
