@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    container_name: habitat_postgres
+    environment:
+      POSTGRES_USER: habitat
+      POSTGRES_PASSWORD: habitat_dev
+      POSTGRES_DB: habitat_development
+    volumes:
+      # Named volume for persistent data (survives container restarts)
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U habitat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Rails API application
+  app:
+    build: .
+    container_name: habitat_app
+    command: rails server -b 0.0.0.0
+    environment:
+      DATABASE_URL: postgresql://habitat:habitat_dev@db:5432/habitat_development
+      RAILS_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount the entire project for live code reloading
+      - .:/habitat
+      # Exclude node_modules and bundle (host versions not needed)
+      - /habitat/node_modules
+      - /habitat/vendor/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
