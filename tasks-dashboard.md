@@ -716,7 +716,7 @@ driver existed to catch them), all fixed as part of this phase:
 
 **Why**: Polish dashboard UI with Bootstrap + custom CSS.
 
-### Task 8.1: Add Bootstrap CDN to layout
+### Task 8.1: Add Bootstrap CDN to layout — [x] DONE
 
 ```erb
 <!-- app/views/layouts/application.html.erb -->
@@ -728,7 +728,7 @@ driver existed to catch them), all fixed as part of this phase:
 
 ---
 
-### Task 8.2: Style modal component (app/assets/stylesheets/modal.css)
+### Task 8.2: Style modal component (app/assets/stylesheets/modal.css) — [x] DONE
 
 ```css
 /* .modal-overlay {} */
@@ -743,7 +743,7 @@ driver existed to catch them), all fixed as part of this phase:
 
 ---
 
-### Task 8.3: Style dashboard layout (app/assets/stylesheets/dashboard.css)
+### Task 8.3: Style dashboard layout (app/assets/stylesheets/dashboard.css) — [x] DONE
 
 ```css
 /* .dashboard-container {} */
