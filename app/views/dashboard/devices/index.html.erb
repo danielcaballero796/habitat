@@ -1,0 +1,41 @@
+<div class="dashboard-container" data-controller="confirm-delete" data-confirm-delete-modal-outlet="#confirm-delete-modal">
+  <header class="dashboard-header d-flex justify-content-between align-items-center">
+    <h1>Your Devices</h1>
+    <%= link_to "+ Add New Device", new_dashboard_device_path, class: "btn btn-primary",
+        data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#device-modal" } %>
+  </header>
+
+  <div id="flash"><%= render "shared/flash", message: flash[:notice] %></div>
+
+  <table class="table devices-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="devices-list">
+      <% if @devices.any? %>
+        <%= render @devices %>
+      <% else %>
+        <tr id="no-devices-row">
+          <td colspan="4" class="empty-state">
+            You have no devices yet.
+            <%= link_to "Add one", new_dashboard_device_path,
+                data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#device-modal" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= render layout: "shared/modal", locals: { id: "device-modal", title: "Add Device" } do %>
+    <%= render "form", device: Device.new %>
+  <% end %>
+
+  <%= render layout: "shared/modal", locals: { id: "confirm-delete-modal", title: "Confirm Delete", data: { "confirm-delete-target": "modal" } } do %>
+    <%= render "delete_confirmation" %>
+  <% end %>
+</div>

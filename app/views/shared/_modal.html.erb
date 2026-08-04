@@ -1,0 +1,33 @@
+<%# Reusable modal component.
+    Locals:
+      id      - unique DOM id for the modal overlay (e.g. "device-modal")
+      title   - heading text shown in the modal header
+      open    - optional; when true, the modal renders already visible
+                (used for full-page navigations to /new and /edit)
+      data    - optional hash of extra data-* attributes merged onto the
+                overlay div (e.g. { "confirm-delete-target": "modal" }, used
+                by the confirm-delete Stimulus controller)
+      content - block yielded as the modal body (form, confirmation text, etc.) %>
+<%# `tag.attributes` renders hash keys as literal attribute names, so a raw
+    key like "confirm-delete-target" would render as
+    confirm-delete-target="modal" (missing the "data-" prefix Stimulus
+    requires to recognize it as a target) unless we prefix it ourselves. %>
+<% extra_data_attributes = (local_assigns[:data] || {}).transform_keys { |key| "data-#{key}" } %>
+<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal"<%= " #{tag.attributes(extra_data_attributes)}".html_safe if extra_data_attributes.present? %>>
+  <div class="modal-backdrop" data-action="click->modal#closeOnBackdrop"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><%= title %></h2>
+      <button type="button" class="modal-close" data-action="click->modal#close" aria-label="Close">
+        &times;
+      </button>
+    </div>
+    <div class="modal-body">
+      <%= yield %>
+    </div>
+  </div>
+</div>
+
+<%# Visual styling (fade/scale animations, Bootstrap `.modal-backdrop`
+    collision fix, etc.) now lives in app/assets/stylesheets/modal.css
+    (Phase 8.2), loaded once via the layout instead of inline per-render. %>

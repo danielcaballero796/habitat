@@ -52,8 +52,9 @@ RUN bundle exec bootsnap precompile app/ lib/
 FROM base
 
 # Install packages needed for deployment
+# chromium: headless browser used by Cuprite (Ferrum) for Capybara system specs
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libvips postgresql-client && \
+    apt-get install --no-install-recommends -y curl libvips postgresql-client chromium && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built artifacts: gems, application

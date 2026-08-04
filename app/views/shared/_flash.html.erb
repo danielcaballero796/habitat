@@ -1,0 +1,14 @@
+<%# Renders a single flash/notice message. Used both for normal page loads
+    (flash[:notice]) and as a Turbo Stream update target (id="flash") after
+    create/update/destroy actions. Auto-dismisses itself after a few
+    seconds via the "flash" Stimulus controller (JS timing is not covered
+    by request specs — no JS test driver in this repo; verify manually).
+    Locals:
+      message - the text to display (nil/blank renders nothing)
+      type    - optional Bootstrap alert type ("success", "danger", etc.),
+                defaults to "success" %>
+<% if message.present? %>
+  <div class="alert alert-<%= local_assigns[:type] || "success" %>" role="alert" data-controller="flash">
+    <%= message %>
+  </div>
+<% end %>

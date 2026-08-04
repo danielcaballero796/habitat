@@ -1,0 +1,24 @@
+<div id="devices-list">
+  <% if devices.any? %>
+    <table class="table devices-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% devices.each do |device| %>
+          <tr id="device-<%= device.id %>">
+            <td><%= device.name %></td>
+            <td><%= device.type %></td>
+            <td><%= device.status %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="empty-state">You have no devices yet</p>
+  <% end %>
+</div>

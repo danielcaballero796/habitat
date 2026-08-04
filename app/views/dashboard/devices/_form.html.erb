@@ -1,0 +1,68 @@
+<%= form_with model: [:dashboard, device], local: true do |f| %>
+  <% if device.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% device.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :name, class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :type, class: "form-label" %>
+    <%= f.select :type, Device.types.keys, { include_blank: true }, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :brand, class: "form-label" %>
+    <%= f.text_field :brand, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :model, class: "form-label" %>
+    <%= f.text_field :model, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :room, class: "form-label" %>
+    <%= f.text_field :room, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :status, class: "form-label" %>
+    <%= f.select :status, ["online", "offline", "unknown"], { include_blank: true }, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :ip_address, class: "form-label" %>
+    <%= f.text_field :ip_address, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :mac_address, class: "form-label" %>
+    <%= f.text_field :mac_address, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :firmware_version, class: "form-label" %>
+    <%= f.text_field :firmware_version, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :purchase_date, class: "form-label" %>
+    <%= f.date_field :purchase_date, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :notes, class: "form-label" %>
+    <%= f.text_area :notes, class: "form-control" %>
+  </div>
+
+  <%= f.submit(device.persisted? ? "Update Device" : "Create Device", class: "btn btn-primary", data: { disable_with: "Guardando..." }) %>
+<% end %>

@@ -11,6 +11,19 @@ gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
+# Modern asset pipeline, required so the dashboard can serve local
+# Stimulus/Turbo JS files pinned via importmap-rails
+gem "propshaft"
+
+# Hotwire: JavaScript modules without bundling (dashboard modal controller)
+gem "importmap-rails"
+
+# Hotwire: SPA-like page accelerator (Turbo Drive/Frames/Streams) for the dashboard
+gem "turbo-rails"
+
+# Hotwire: lightweight JS framework for the dashboard modal controller
+gem "stimulus-rails"
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
@@ -50,6 +63,22 @@ group :development, :test do
 
   # Factory Bot for test data fixtures
   gem "factory_bot_rails"
+end
+
+group :test do
+  # Browser-driven integration testing (system specs)
+  gem "capybara"
+
+  # Headless Chrome driver via CDP (Chrome DevTools Protocol) — no separate
+  # selenium-standalone container needed, talks directly to the chromium
+  # binary installed in the Docker image.
+  gem "cuprite"
+
+  # System specs run the Rails app in a real Puma server thread, which uses
+  # its own DB connection outside the test thread's open transaction — so
+  # the usual `use_transactional_fixtures` rollback is invisible to it.
+  # DatabaseCleaner truncates instead for `type: :system` specs only.
+  gem "database_cleaner-active_record"
 end
 
 group :development do
