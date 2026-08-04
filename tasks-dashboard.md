@@ -379,7 +379,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 **Why**: Nested resource CRUD; reuses modal pattern from devices.
 
-### Task 5.1: Create Dashboard::DeviceAttributesController
+### Task 5.1: Create Dashboard::DeviceAttributesController — [x] DONE
 
 ```ruby
 # app/controllers/dashboard/device_attributes_controller.rb
@@ -394,7 +394,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 5.2: Create attributes list row partial (dashboard/device_attributes/_attribute.html.erb)
+### Task 5.2: Create attributes list row partial (dashboard/device_attributes/_attribute.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/device_attributes/_attribute.html.erb -->
@@ -407,7 +407,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 5.3: Create attribute form partial (dashboard/device_attributes/_form.html.erb)
+### Task 5.3: Create attribute form partial (dashboard/device_attributes/_form.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/device_attributes/_form.html.erb -->
@@ -422,7 +422,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 5.4: Implement attribute create action (POST /v1/devices/:device_id/device_attributes)
+### Task 5.4: Implement attribute create action (POST /dashboard/devices/:device_id/device_attributes) — [x] DONE
 
 ```ruby
 # In Dashboard::DeviceAttributesController#create
@@ -441,7 +441,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 5.5: Implement attribute update action (PATCH)
+### Task 5.5: Implement attribute update action (PATCH) — [x] DONE
 
 ```ruby
 # In Dashboard::DeviceAttributesController#update
@@ -460,7 +460,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 5.6: Implement attribute delete action (DELETE)
+### Task 5.6: Implement attribute delete action (DELETE) — [x] DONE
 
 ```ruby
 # In Dashboard::DeviceAttributesController#destroy
@@ -519,7 +519,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 ---
 
-### Task 6.4: Add routes for nested attributes
+### Task 6.4: Add routes for nested attributes — [x] DONE (pulled forward into Phase 5, hard dependency for nested CRUD to route at all)
 
 ```ruby
 # config/routes.rb

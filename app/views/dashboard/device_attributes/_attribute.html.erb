@@ -1,0 +1,11 @@
+<tr id="attribute-<%= attribute.id %>">
+  <td><strong><%= attribute.key %></strong></td>
+  <td><%= attribute.value %></td>
+  <td><%= attribute.updated_at %></td>
+  <td class="actions">
+    <%= link_to "Edit", edit_dashboard_device_device_attribute_path(attribute.device, attribute), class: "btn btn-sm btn-warning", data: { action: "click->modal#open" } %>
+    <%= button_to "Delete", dashboard_device_device_attribute_path(attribute.device, attribute), method: :delete,
+        class: "btn btn-sm btn-danger",
+        form: { data: { turbo_confirm: "Are you sure you want to delete this attribute?" } } %>
+  </td>
+</tr>

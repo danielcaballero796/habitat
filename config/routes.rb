@@ -21,6 +21,8 @@ Rails.application.routes.draw do
   # exclude :new and :edit by default (API apps don't render HTML forms), so
   # the dashboard's device routes list every action explicitly.
   namespace :dashboard do
-    resources :devices, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+    resources :devices, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+      resources :device_attributes, only: [:new, :create, :edit, :update, :destroy]
+    end
   end
 end

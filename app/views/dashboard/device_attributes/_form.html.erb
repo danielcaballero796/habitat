@@ -1,0 +1,23 @@
+<%= form_with model: [:dashboard, device, attribute], local: true do |f| %>
+  <% if attribute.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% attribute.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :key, class: "form-label" %>
+    <%= f.text_field :key, class: "form-control", disabled: attribute.persisted? %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :value, class: "form-label" %>
+    <%= f.text_field :value, class: "form-control" %>
+  </div>
+
+  <%= f.submit(attribute.persisted? ? "Update Attribute" : "Create Attribute", class: "btn btn-primary", data: { disable_with: "Guardando..." }) %>
+<% end %>

@@ -26,9 +26,36 @@
   </div>
 
   <div class="attributes-section">
-    <h3>Device Attributes</h3>
-    <%# Nested Device Attributes CRUD (list, add/edit/delete) is built out
-        in Phase 5. This placeholder just confirms the section renders. %>
-    <p class="empty-state">No attributes yet.</p>
+    <header class="d-flex justify-content-between align-items-center">
+      <h3>Device Attributes</h3>
+      <%= link_to "+ Add Attribute", new_dashboard_device_device_attribute_path(@device), class: "btn btn-primary", data: { action: "click->modal#open" } %>
+    </header>
+
+    <table class="table attributes-table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+          <th>Updated At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="attributes-list">
+        <% if @device.device_attributes.any? %>
+          <%= render @device.device_attributes %>
+        <% else %>
+          <tr id="no-attributes-row">
+            <td colspan="4" class="empty-state">
+              No attributes yet.
+              <%= link_to "Add one", new_dashboard_device_device_attribute_path(@device), data: { action: "click->modal#open" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= render layout: "shared/modal", locals: { id: "attribute-modal", title: "Add Attribute" } do %>
+      <%= render "dashboard/device_attributes/form", device: @device, attribute: DeviceAttribute.new %>
+    <% end %>
   </div>
 </div>
