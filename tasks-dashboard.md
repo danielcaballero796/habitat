@@ -834,7 +834,7 @@ the app's error handling.
 
 **Why**: Final touches before archiving.
 
-### Task 10.1: Add accessibility features
+### Task 10.1: Add accessibility features — [x] DONE
 
 ```erb
 <!-- form labels with for= -->
@@ -845,9 +845,42 @@ the app's error handling.
 
 **Testable**: Keyboard navigation works, screen reader-friendly.
 
+**Result**: Form labels already used Rails' `f.label` helper across all
+three dashboard forms (login, device, attribute), which auto-generates
+matching `for=`/`id` pairs — no change needed there, verified by the
+existing Capybara `fill_in`/`find_field` calls (label lookup) passing.
+Row action links ("View"/"Edit"/"Delete") already carry visible text so
+no icon-only-button aria-labels were needed; the modal's "x" close
+button already had `aria-label="Close"`. Native Tab order was already
+correct (no custom `tabindex`).
+
+The real gap was focus management: `modal_controller.js` opened/closed
+modals via `classList` only, with no focus trap and no return-focus
+behavior, and the delete-confirmation modal bypassed `modal#open`
+entirely (`confirm_delete_controller.js` toggled the `open` class
+directly). Implemented:
+- `modal_controller.js#open`: remembers the triggering element, moves
+  focus to the first real form field (skipping the "x" close button),
+  and attaches a keydown listener.
+- `modal_controller.js#handleKeydown`: Escape closes the modal; Tab /
+  Shift+Tab cycle focus within the modal's own focusable elements only
+  (never escapes to the page behind it).
+- `modal_controller.js#close` / `#closeViaStream`: remove the keydown
+  listener and return focus to the element that opened the modal.
+- `confirm_delete_controller.js`: now opens its modal via a Stimulus
+  `modal` outlet (`this.modalOutlet.open(event)`) instead of touching
+  `classList` directly, so the delete-confirmation dialogs get the same
+  focus-trap / return-focus behavior as every other modal.
+
+TDD: `spec/system/dashboard/accessibility_spec.rb` (5 real
+Capybara/Cuprite system specs — actual browser focus/keyboard events,
+no stubs) written first; 3 of 5 were already GREEN (native Tab order
+already worked), 2 were RED (Escape-to-close, delete-modal focus trap)
+until the JS changes above landed. All 5 GREEN after implementation.
+
 ---
 
-### Task 10.2: Test in multiple browsers
+### Task 10.2: Test in multiple browsers — [x] DONE (scope-limited)
 
 ```
 - Chrome: check modal animation, form submission
@@ -857,6 +890,23 @@ the app's error handling.
 ```
 
 **Testable**: No visual/functional differences across browsers.
+
+**Result**: This repo's Docker-based system-test setup only has headless
+Chromium available (Cuprite/CDP) — no Firefox/Safari/Edge engine is
+installed in the container, so those browsers were **not actually run**
+and no fake "passing" specs were written for them (per explicit
+instruction). What was done instead, honestly:
+- Grepped `app/` for vendor-prefixed CSS (`-webkit-`, `-moz-`, `-ms-`),
+  browser-sniffing (`navigator.*` beyond standard DOM), and
+  `ActiveXObject`/similar non-standard APIs: **zero matches**. The app
+  only uses Stimulus, Turbo (Hotwire), and Bootstrap 5 — all
+  standards-based libraries designed for cross-browser support, plus
+  plain DOM APIs (`classList`, `querySelectorAll`, `closest`, `focus`)
+  supported by all evergreen browsers.
+- Firefox/Safari/Edge verification is **explicitly out of scope** for
+  this automated pass. It would require either a cross-browser cloud
+  grid (BrowserStack/Sauce Labs) or manual verification on real
+  browsers, neither of which is available in this environment.
 
 ---
 
