@@ -6,6 +6,8 @@ module Dashboard
   class DevicesController < DashboardController
     before_action :set_device, only: [:show, :edit, :update, :destroy]
 
+    rescue_from ActiveRecord::RecordNotFound, with: :redirect_device_not_found
+
     def index
       @devices = Device.all
     end
@@ -59,6 +61,10 @@ module Dashboard
 
     def set_device
       @device = Device.find(params[:id])
+    end
+
+    def redirect_device_not_found
+      redirect_to dashboard_devices_path, notice: "Device not found"
     end
 
     def device_params

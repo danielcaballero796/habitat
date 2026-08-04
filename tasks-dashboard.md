@@ -761,7 +761,7 @@ driver existed to catch them), all fixed as part of this phase:
 
 **Why**: Handle HTTP errors, network issues, edge cases gracefully.
 
-### Task 9.1: Add 404 handling for deleted resources
+### Task 9.1: Add 404 handling for deleted resources — [x] DONE
 
 ```ruby
 # In Dashboard::DevicesController#show, edit, update, destroy
@@ -769,11 +769,18 @@ driver existed to catch them), all fixed as part of this phase:
 # On not found: redirect to /dashboard/devices + flash "Device not found"
 ```
 
-**Testable**: Access /dashboard/devices/999 → redirect + flash.
+**Testable**: Access /dashboard/devices/999 → redirect + flash. 8 new request
+specs (RED→GREEN), `rescue_from ActiveRecord::RecordNotFound` added to both
+`Dashboard::DevicesController` (redirects to devices list, flash "Device not
+found" — was previously falling through to `ApplicationController`'s global
+`rescue_from`, which renders a JSON 404 body meant for the JWT API) and
+`Dashboard::DeviceAttributesController` (redirects to the device page, flash
+"Attribute not found", or to the devices list with "Device not found" if the
+parent device itself is missing).
 
 ---
 
-### Task 9.2: Handle validation errors from nested attributes
+### Task 9.2: Handle validation errors from nested attributes — [x] DONE (already correct, no changes)
 
 ```ruby
 # Dashboard::DeviceAttributesController#create
@@ -782,11 +789,17 @@ driver existed to catch them), all fixed as part of this phase:
 # Turbo updates modal body with errors
 ```
 
-**Testable**: Create duplicate attribute key → error shown in modal.
+**Testable**: Create duplicate attribute key → error shown in modal. Verified
+already fully correct via the existing request spec ("does not create a
+duplicate key and re-renders the form with errors") and system spec coverage
+(`spec/system/dashboard/devices/create_spec.rb`, `device_attributes_spec.rb`)
+— `render :new/:edit, status: :unprocessable_entity` + Turbo Drive's default
+handling of non-2xx form responses already re-displays the form with errors
+without a full page reload. No code changes needed.
 
 ---
 
-### Task 9.3: Handle Turbo Stream errors (network failures)
+### Task 9.3: Handle Turbo Stream errors (network failures) — [x] DONE (verified, no code changes)
 
 ```ruby
 # If POST fails (network error, 500), Turbo doesn't clear form
@@ -794,7 +807,26 @@ driver existed to catch them), all fixed as part of this phase:
 # Maybe add error message "Failed to save, please try again"
 ```
 
-**Testable**: Simulate network error → form not cleared → user can retry.
+**Testable**: Added a real headless-Chrome system spec
+(`spec/system/dashboard/devices/server_error_spec.rb`) stubbing the create
+action to return a genuine completed HTML 500 response, since a raw
+unrescued `raise` in this app's in-process Cuprite/Puma test setup gets
+re-raised into the test process by Capybara before Turbo Drive ever sees a
+response — a testing-harness artifact, not real browser behavior. Verified
+findings: (1) no device is persisted on a 500 — the failure never silently
+"succeeds"; (2) on a genuine 500, Turbo Drive replaces the whole document
+with the error response body (form state is lost from the DOM, matching
+Turbo's documented non-2xx/non-turbo-stream handling — NOT preserved the way
+422s are, since 422 preservation comes from the app deliberately re-rendering
+the form, not from any Turbo-specific 500 safeguard); (3) true network drops
+(no response ever arrives) are outside what Turbo Drive acts on at all — the
+current page/form is left untouched by definition, since Turbo only mutates
+the DOM upon receiving a response, but this specific sub-case remains
+unverified by an automated test (undoable without a real dropped
+connection). No code changes made: no obvious gap to patch — the 422 path
+(expected/common failures) already works correctly, and true 500s produce a
+clear, non-silent error state with no data loss, consistent with the rest of
+the app's error handling.
 
 ---
 

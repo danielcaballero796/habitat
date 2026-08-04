@@ -82,6 +82,43 @@ RSpec.describe "Dashboard::DeviceAttributes", type: :request do
     end
   end
 
+  describe "GET /dashboard/devices/:device_id/device_attributes/:id/edit for a missing attribute" do
+    it "redirects to the device page with a flash message instead of erroring" do
+      get "/dashboard/devices/#{device.id}/device_attributes/999999/edit"
+
+      expect(response).to redirect_to(dashboard_device_path(device))
+      follow_redirect!
+      expect(response.body).to include("Attribute not found")
+    end
+  end
+
+  describe "PATCH /dashboard/devices/:device_id/device_attributes/:id for a missing attribute" do
+    it "redirects to the device page with a flash message instead of erroring" do
+      patch "/dashboard/devices/#{device.id}/device_attributes/999999",
+            params: { device_attribute: { value: "x" } }
+
+      expect(response).to redirect_to(dashboard_device_path(device))
+    end
+  end
+
+  describe "DELETE /dashboard/devices/:device_id/device_attributes/:id for a missing attribute" do
+    it "redirects to the device page with a flash message instead of erroring" do
+      delete "/dashboard/devices/#{device.id}/device_attributes/999999"
+
+      expect(response).to redirect_to(dashboard_device_path(device))
+    end
+  end
+
+  describe "GET /dashboard/devices/:device_id/device_attributes for a missing device" do
+    it "redirects to the devices list with a flash message instead of erroring" do
+      get "/dashboard/devices/999999/device_attributes/new"
+
+      expect(response).to redirect_to(dashboard_devices_path)
+      follow_redirect!
+      expect(response.body).to include("Device not found")
+    end
+  end
+
   describe "DELETE /dashboard/devices/:device_id/device_attributes/:id" do
     it "deletes the attribute and returns a turbo stream response" do
       attribute = DeviceAttribute.create!(device: device, key: "brightness", value: "50")

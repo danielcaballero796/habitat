@@ -165,6 +165,40 @@ RSpec.describe "Dashboard::Devices", type: :request do
     end
   end
 
+  describe "GET /dashboard/devices/:id for a missing device" do
+    it "redirects to the devices list with a flash message instead of erroring" do
+      get "/dashboard/devices/999999"
+
+      expect(response).to redirect_to(dashboard_devices_path)
+      follow_redirect!
+      expect(response.body).to include("Device not found")
+    end
+  end
+
+  describe "GET /dashboard/devices/:id/edit for a missing device" do
+    it "redirects to the devices list with a flash message instead of erroring" do
+      get "/dashboard/devices/999999/edit"
+
+      expect(response).to redirect_to(dashboard_devices_path)
+    end
+  end
+
+  describe "PATCH /dashboard/devices/:id for a missing device" do
+    it "redirects to the devices list with a flash message instead of erroring" do
+      patch "/dashboard/devices/999999", params: { device: { name: "Nope" } }
+
+      expect(response).to redirect_to(dashboard_devices_path)
+    end
+  end
+
+  describe "DELETE /dashboard/devices/:id for a missing device" do
+    it "redirects to the devices list with a flash message instead of erroring" do
+      delete "/dashboard/devices/999999"
+
+      expect(response).to redirect_to(dashboard_devices_path)
+    end
+  end
+
   describe "DELETE /dashboard/devices/:id" do
     it "deletes the device and returns a turbo stream response" do
       device = Device.create!(name: "Living Room Plug", type: :smart_plug)

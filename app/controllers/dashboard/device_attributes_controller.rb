@@ -9,6 +9,8 @@ module Dashboard
     before_action :set_device
     before_action :set_attribute, only: [:edit, :update, :destroy]
 
+    rescue_from ActiveRecord::RecordNotFound, with: :redirect_not_found
+
     def new
       @attribute = @device.device_attributes.new
     end
@@ -60,6 +62,14 @@ module Dashboard
 
     def set_attribute
       @attribute = @device.device_attributes.find(params[:id])
+    end
+
+    def redirect_not_found
+      if @device.nil?
+        redirect_to dashboard_devices_path, notice: "Device not found"
+      else
+        redirect_to dashboard_device_path(@device), notice: "Attribute not found"
+      end
     end
 
     def attribute_params
