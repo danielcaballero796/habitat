@@ -66,6 +66,24 @@ RSpec.describe "Device attributes CRUD from the dashboard", type: :system do
     expect(DeviceAttribute.exists?(attribute.id)).to be false
   end
 
+  it "keeps the attribute and closes the modal on cancel" do
+    attribute = DeviceAttribute.create!(device: device, key: "power_w", value: "12.5")
+    visit "/dashboard/devices/#{device.id}"
+
+    within "#attribute-#{attribute.id}" do
+      click_link "Delete"
+    end
+
+    expect(page).to have_css("#confirm-delete-attribute-modal.open")
+    within "#confirm-delete-attribute-modal" do
+      click_button "Cancel"
+    end
+
+    expect(page).not_to have_css("#confirm-delete-attribute-modal.open")
+    expect(page).to have_css("#attribute-#{attribute.id}")
+    expect(DeviceAttribute.exists?(attribute.id)).to be true
+  end
+
   it "shows a validation error when creating a duplicate key" do
     DeviceAttribute.create!(device: device, key: "power_w", value: "12.5")
     visit "/dashboard/devices/#{device.id}"

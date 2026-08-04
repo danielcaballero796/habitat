@@ -7,6 +7,7 @@ module Dashboard
     before_action :set_device, only: [:show, :edit, :update, :destroy]
 
     rescue_from ActiveRecord::RecordNotFound, with: :redirect_device_not_found
+    rescue_from ArgumentError, with: :handle_invalid_type
 
     def index
       @devices = Device.all
@@ -65,6 +66,21 @@ module Dashboard
 
     def redirect_device_not_found
       redirect_to dashboard_devices_path, notice: "Device not found"
+    end
+
+    # Device#type is a Rails enum backed by a closed list. Assigning an
+    # unrecognized value (e.g. tampered <select>, curl, disabled JS) raises
+    # ArgumentError instead of producing a validation error, so we rescue it
+    # here and turn it into the spec-required 422 + re-rendered form.
+    def handle_invalid_type
+      @device ||= Device.new(device_params.except(:type))
+      @device.errors.add(:type, "Invalid device type")
+
+      if action_name == "update"
+        render :edit, status: :unprocessable_entity
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
 
     def device_params

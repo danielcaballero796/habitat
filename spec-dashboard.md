@@ -188,6 +188,8 @@ And error message is displayed
 
 **Why this test?** Type must be valid enum value (smart_plug, led_controller, etc.); API validates.
 
+**Covered by**: `spec/requests/dashboard/devices_spec.rb` ("does not create a device with an invalid type..." / "does not update with an invalid type..."). Rails `enum` raises `ArgumentError` on an unrecognized value rather than producing a model validation error; `Dashboard::DevicesController` rescues it via `rescue_from ArgumentError, with: :handle_invalid_type` and re-renders `:new`/`:edit` with 422 and an "Invalid device type" message.
+
 ---
 
 ## Capability 4: View Device Details
@@ -410,6 +412,8 @@ And error message is displayed in form
 And no attribute is created
 ```
 
+**Covered by**: `spec/requests/dashboard/device_attributes_spec.rb` ("does not create an attribute with a blank key and re-renders the form with errors").
+
 **Why this test?** Required field validation via Turbo.
 
 ---
@@ -526,6 +530,8 @@ Then the confirmation closes
 And NO delete request is sent
 And the attribute remains in the table
 ```
+
+**Covered by**: `spec/system/dashboard/device_attributes_spec.rb` ("keeps the attribute and closes the modal on cancel"), mirroring the device-level cancel flow in `spec/system/dashboard/devices/destroy_spec.rb`.
 
 **Why this test?** User can cancel.
 

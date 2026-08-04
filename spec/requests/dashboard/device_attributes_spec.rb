@@ -43,6 +43,16 @@ RSpec.describe "Dashboard::DeviceAttributes", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("must be unique per device")
     end
+
+    it "does not create an attribute with a blank key and re-renders the form with errors" do
+      expect {
+        post "/dashboard/devices/#{device.id}/device_attributes",
+             params: { device_attribute: { key: "", value: "80" } }, as: :turbo_stream
+      }.not_to change(DeviceAttribute, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("can&#39;t be blank").or include("can't be blank")
+    end
   end
 
   describe "GET /dashboard/devices/:device_id/device_attributes/:id/edit" do

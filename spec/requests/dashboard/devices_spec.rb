@@ -94,6 +94,15 @@ RSpec.describe "Dashboard::Devices", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("can&#39;t be blank").or include("can't be blank")
     end
+
+    it "does not create a device with an invalid type and re-renders the form with a 422 instead of erroring" do
+      expect {
+        post "/dashboard/devices", params: { device: { name: "Kitchen Plug", type: "bogus" } }, as: :turbo_stream
+      }.not_to change(Device, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Invalid device type")
+    end
   end
 
   describe "GET /dashboard/devices/:id" do
@@ -162,6 +171,16 @@ RSpec.describe "Dashboard::Devices", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(device.reload.name).to eq("Living Room Plug")
+    end
+
+    it "does not update with an invalid type and re-renders the form with a 422 instead of erroring" do
+      device = Device.create!(name: "Living Room Plug", type: :smart_plug)
+
+      patch "/dashboard/devices/#{device.id}", params: { device: { type: "bogus" } }, as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Invalid device type")
+      expect(device.reload.type).to eq("smart_plug")
     end
   end
 
