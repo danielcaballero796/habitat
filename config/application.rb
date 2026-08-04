@@ -35,6 +35,12 @@ module Habitat
     config.session_store :cookie_store, key: "_habitat_session"
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
+    # api_only also skips requiring the flash middleware file entirely, so
+    # ActionDispatch::Request never gets its `flash` method mixed in at all
+    # (NoMethodError, not just an empty flash) — request specs/system specs
+    # never hit this because something else in that boot path loads the file
+    # first; a real `rails server` boot does not.
+    config.middleware.use ActionDispatch::Flash
 
     # The dashboard's edit/update forms are real HTML <form> elements that
     # submit PATCH/PUT/DELETE via the standard Rails `_method` hidden field
