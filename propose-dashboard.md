@@ -3,7 +3,7 @@
 **Change ID**: `2026-08-04-device-dashboard`  
 **Architecture Decision**: Option A — Rails + Turbo/Hotwire (same codebase, server-rendered ERB views)  
 **Status**: PROPOSE phase  
-**Scope**: MVP dashboard for viewing and managing devices (no new backend features)
+**Scope**: Full CRUD dashboard — devices (list, create, view, update, delete) + nested device attributes (create, update, delete)
 
 ---
 
@@ -23,7 +23,7 @@ You chose **Rails + Turbo/Hotwire** because:
 
 ---
 
-## Concrete Feature Set (MVP)
+## Concrete Feature Set (Full CRUD Dashboard)
 
 ### What's IN Scope
 
@@ -31,7 +31,8 @@ You chose **Rails + Turbo/Hotwire** because:
 ```
 /dashboard
   Shows: "Welcome, admin@habitat.local | Logout"
-  Shows: List of all devices (summary view)
+  Shows: List of all devices (summary view with action buttons)
+  Shows: Button to "Add New Device"
 ```
 
 **Feature 1: View Devices List**
@@ -42,67 +43,139 @@ Displays:
   - Device name
   - Device type (smart_plug, led_controller, etc.)
   - Device status (online, offline, etc.)
-  - Action links: View, Rename, Delete
+  - Action links: View, Edit, Delete
+  - "Add New Device" button at top
   
 Example:
-  [Living Room Plug]      [smart_plug] [online]    [View] [Rename] [Delete]
-  [Bedroom Light]          [led_controller] [online] [View] [Rename] [Delete]
+  [Living Room Plug]      [smart_plug] [online]    [View] [Edit] [Delete]
+  [Bedroom Light]         [led_controller] [online] [View] [Edit] [Delete]
+  [+ Add New Device]
 ```
 
-**Feature 2: View Device Details**
+**Feature 2: Create New Device (Turbo Form)**
+```
+GET /dashboard/devices/new (show form)
+POST /dashboard/devices (create via Turbo)
+
+Form fields:
+  - Name (required)
+  - Type (dropdown: smart_plug, led_controller, etc.)
+  - Brand (optional)
+  - Model (optional)
+  - Room (optional)
+  - Status (optional)
+  - IP Address (optional)
+  - MAC Address (optional)
+  - Firmware Version (optional)
+  - Purchase Date (optional)
+  - Notes (optional)
+
+Flow:
+  1. User clicks "Add New Device"
+  2. Turbo modal/drawer opens with form (no page reload)
+  3. User fills form, submits
+  4. Server creates device via existing POST /v1/devices endpoint
+  5. Turbo adds new device to list (no refresh)
+  6. Flash message "Device created successfully"
+```
+
+**Feature 3: View Device Details**
 ```
 GET /dashboard/devices/:id (server-rendered ERB)
 
 Displays:
-  - Device name, type, brand, model, room, IP, MAC, firmware version
+  - Device name, type, brand, model, room, IP, MAC, firmware version, purchase date, notes
+  - Edit/Delete buttons for device
   - All device attributes in a table:
-    | Key        | Value  | Last Updated |
-    | power_w    | 12.5   | 2026-08-04   |
-    | voltage_v  | 230    | 2026-08-04   |
-  
-  - Action links: Back, Rename Device, Delete Device
-  - Maybe: Link to add a new attribute (POST) — TBD in design
+    | Key        | Value  | Last Updated | Actions |
+    | power_w    | 12.5   | 2026-08-04   | [Edit] [Delete] |
+    | voltage_v  | 230    | 2026-08-04   | [Edit] [Delete] |
+  - "Add New Attribute" button below table
 ```
 
-**Feature 3: Rename Device (Turbo Action)**
+**Feature 4: Edit Device (Turbo Action)**
 ```
-PATCH /dashboard/devices/:id/update_name (Turbo form)
+GET /dashboard/devices/:id/edit (show edit form)
+PATCH /dashboard/devices/:id (update via Turbo)
 
 Flow:
-  1. User clicks "Rename" link on device card
-  2. Turbo opens an in-place form (no page reload)
-  3. User types new name, submits
-  4. Server updates device via existing PATCH /v1/devices/:id endpoint
-  5. Turbo replaces the device card with updated data
-  6. User sees new name instantly (no page refresh)
-
-Example:
-  [Living Room Plug] [Rename ×] → User types "Kitchen Plug" → Updates instantly
+  1. User clicks "Edit" on device card or detail page
+  2. Turbo form appears (in-place or modal)
+  3. User modifies fields, submits
+  4. Server updates device via existing PATCH /v1/devices/:id
+  5. Turbo replaces device data with updated values
+  6. Flash message "Device updated"
 ```
 
-**Feature 4: Delete Device (Turbo Action)**
+**Feature 5: Delete Device (Turbo Action)**
 ```
 DELETE /dashboard/devices/:id (Turbo confirmation)
 
 Flow:
-  1. User clicks "Delete" link on device card
-  2. Turbo shows a confirmation dialog (built-in Turbo UX)
-  3. On confirm, sends DELETE request to /v1/devices/:id
-  4. Turbo removes the device from the page (no reload)
-  5. Shows flash message "Device deleted"
+  1. User clicks "Delete" on device
+  2. Turbo shows confirmation dialog
+  3. On confirm, sends DELETE to /v1/devices/:id
+  4. Turbo removes device from list (no reload)
+  5. Flash message "Device deleted"
+```
+
+**Feature 6: Create Device Attribute (Turbo Form)**
+```
+GET /dashboard/devices/:id/attributes/new (show form)
+POST /dashboard/devices/:id/attributes (create via Turbo)
+
+Form fields:
+  - Key (required, text: "power_w", "voltage_v", etc.)
+  - Value (required, text: "12.5", "230", etc.)
+
+Flow:
+  1. User clicks "Add New Attribute" on device detail page
+  2. Turbo form appears inline (in table or below)
+  3. User enters key/value, submits
+  4. Server creates attribute via existing POST /v1/devices/:device_id/device_attributes
+  5. Turbo adds row to attributes table (no page reload)
+  6. Flash message "Attribute added"
+```
+
+**Feature 7: Edit Device Attribute (Turbo Action)**
+```
+GET /dashboard/devices/:id/attributes/:attr_id/edit (show form)
+PATCH /dashboard/devices/:id/attributes/:attr_id (update via Turbo)
+
+Editable fields:
+  - Value (key is immutable)
+
+Flow:
+  1. User clicks "Edit" on attribute row
+  2. Turbo inline form appears (table cell becomes input)
+  3. User updates value, submits
+  4. Server updates via existing PATCH /v1/devices/:device_id/device_attributes/:id
+  5. Turbo updates table row (no reload)
+  6. Flash message "Attribute updated"
+```
+
+**Feature 8: Delete Device Attribute (Turbo Action)**
+```
+DELETE /dashboard/devices/:id/attributes/:attr_id (Turbo confirmation)
+
+Flow:
+  1. User clicks "Delete" on attribute row
+  2. Turbo shows confirmation (optional, can be inline)
+  3. On confirm, sends DELETE to /v1/devices/:device_id/device_attributes/:id
+  4. Turbo removes row from attributes table (no reload)
+  5. Flash message "Attribute deleted"
 ```
 
 ### What's OUT of Scope (For This Change)
 
-❌ Add new device (POST endpoint exists, but dashboard form not needed yet)  
-❌ Manage device attributes (create/update/delete attributes from UI)  
 ❌ Automation rules or scheduling  
 ❌ Real-time status updates (would need WebSocket)  
 ❌ Search/filter devices  
-❌ Pagination (assuming <50 devices for MVP)  
+❌ Pagination (assuming <50 devices)  
 ❌ Device history or logs  
 ❌ Mobile responsiveness (basic styling only)  
-❌ Admin panel for multi-user (single user only, matching current auth)
+❌ Admin panel for multi-user (single user only, matching current auth)  
+❌ Attribute duplicate-key validation from UI (API endpoint validates, UI shows error)
 
 ### Nice-to-Have (If Time)
 
@@ -110,6 +183,7 @@ Flow:
 - Flash messages ("Device renamed successfully!")
 - Loading indicators on Turbo actions
 - Empty state message ("No devices yet")
+- Confirmation dialogs for all destructive actions
 
 ---
 
