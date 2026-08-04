@@ -11,6 +11,19 @@ gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
+# Modern asset pipeline, required so the dashboard can serve local
+# Stimulus/Turbo JS files pinned via importmap-rails
+gem "propshaft"
+
+# Hotwire: JavaScript modules without bundling (dashboard modal controller)
+gem "importmap-rails"
+
+# Hotwire: SPA-like page accelerator (Turbo Drive/Frames/Streams) for the dashboard
+gem "turbo-rails"
+
+# Hotwire: lightweight JS framework for the dashboard modal controller
+gem "stimulus-rails"
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

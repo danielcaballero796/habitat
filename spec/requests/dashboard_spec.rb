@@ -32,6 +32,13 @@ RSpec.describe "Dashboard", type: :request do
         get "/dashboard"
         expect(response.body).to include("Living Room Plug")
       end
+
+      it "renders the device modal shell wired to the Stimulus modal controller" do
+        get "/dashboard"
+        expect(response.body).to include('id="device-modal"')
+        expect(response.body).to include('data-controller="modal"')
+        expect(response.body).to include('data-action="click->modal#closeOnBackdrop"')
+      end
     end
 
     context "when not logged in" do

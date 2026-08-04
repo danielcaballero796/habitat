@@ -1,2 +1,6 @@
-<%# Placeholder for the "Add/Edit Device" modal. Built out in Phase 3/4
-    (Stimulus modal controller + device form). %>
+<%# "Add/Edit Device" modal shell. The device form itself is built in Phase 4;
+    for now this proves the shared modal component + Stimulus controller
+    wiring (Phase 3). %>
+<%= render layout: "shared/modal", locals: { id: "device-modal", title: "Add Device" } do %>
+  <p class="text-muted">The device form will be added in Phase 4.</p>
+<% end %>

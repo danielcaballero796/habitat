@@ -127,11 +127,11 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-## Phase 3: Stimulus Modal Controller & Integration (3 tasks)
+## Phase 3: Stimulus Modal Controller & Integration (3 tasks) — [x] COMPLETE
 
 **Why**: Modal interactivity foundation for all CRUD. Build reusable component first.
 
-### Task 3.1: Create Stimulus modal controller (app/javascript/controllers/modal_controller.js)
+### Task 3.1: Create Stimulus modal controller (app/javascript/controllers/modal_controller.js) — [x] DONE
 
 ```javascript
 // import { Controller } from "@hotwired/stimulus"
@@ -172,7 +172,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 3.2: Create shared modal component (_modal.html.erb)
+### Task 3.2: Create shared modal component (_modal.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/shared/_modal.html.erb -->
@@ -189,7 +189,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 3.3: Create custom Turbo Stream action for closing modals
+### Task 3.3: Create custom Turbo Stream action for closing modals — [x] DONE
 
 ```javascript
 // app/javascript/controllers/turbo_stream_actions.js
