@@ -10,6 +10,10 @@
 /.bundle
 /vendor/bundle
 
+# Rails secrets — never commit these
+/config/master.key
+/config/credentials/*.key
+
 .env
 .env.*
 !.env.example
@@ -20,3 +24,5 @@
 .byebug_history
 
 bash.exe.stackdump
+
+/config/credentials/development.key
