@@ -4,8 +4,11 @@
       title   - heading text shown in the modal header
       open    - optional; when true, the modal renders already visible
                 (used for full-page navigations to /new and /edit)
+      data    - optional hash of extra data-* attributes merged onto the
+                overlay div (e.g. { "confirm-delete-target": "modal" }, used
+                by the confirm-delete Stimulus controller)
       content - block yielded as the modal body (form, confirmation text, etc.) %>
-<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal">
+<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal"<%= " #{tag.attributes(local_assigns[:data])}".html_safe if local_assigns[:data].present? %>>
   <div class="modal-backdrop" data-action="click->modal#closeOnBackdrop"></div>
   <div class="modal-content">
     <div class="modal-header">

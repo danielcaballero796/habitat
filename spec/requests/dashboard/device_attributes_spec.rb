@@ -93,6 +93,8 @@ RSpec.describe "Dashboard::DeviceAttributes", type: :request do
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("action=\"remove\"")
       expect(response.body).to include("target=\"attribute-#{attribute.id}\"")
+      expect(response.body).to include("action=\"close_modal\"")
+      expect(response.body).to include("target=\"confirm-delete-attribute-modal\"")
       expect(response.body).to include("Attribute deleted successfully")
     end
   end

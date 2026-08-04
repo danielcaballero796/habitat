@@ -1,0 +1,16 @@
+<%# Confirmation modal body for deleting a device attribute. Rendered once
+    per device show page inside #confirm-delete-attribute-modal. The
+    confirm-delete Stimulus controller (scoped on the attributes-section,
+    see _attribute.html.erb / show.html.erb) points this form at the
+    clicked row's destroy URL and fills in the attribute key before opening
+    the modal. %>
+<p>
+  Are you sure you want to delete the attribute
+  <strong data-confirm-delete-target="name">this attribute</strong>?
+</p>
+<div class="modal-actions">
+  <%= form_with url: "#", method: :delete, local: true, html: { data: { "confirm-delete-target": "form" } } do |f| %>
+    <%= f.submit "Confirm Delete", class: "btn btn-danger" %>
+  <% end %>
+  <button type="button" class="btn btn-secondary" data-action="click->modal#close">Cancel</button>
+</div>

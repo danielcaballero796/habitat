@@ -46,7 +46,7 @@ module Dashboard
       @attribute.destroy
 
       render turbo_stream: [
-        turbo_stream.action(:close_modal, "confirm-delete-modal"),
+        turbo_stream.action(:close_modal, "confirm-delete-attribute-modal"),
         turbo_stream.remove("attribute-#{@attribute.id}"),
         turbo_stream.update("flash", partial: "shared/flash", locals: { message: "Attribute deleted successfully" })
       ]

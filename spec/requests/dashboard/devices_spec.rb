@@ -28,6 +28,18 @@ RSpec.describe "Dashboard::Devices", type: :request do
       expect(response.body).to include("+ Add New Device")
     end
 
+    it "renders a delete-confirmation modal instead of a browser confirm dialog" do
+      device = Device.create!(name: "Living Room Plug", type: :smart_plug)
+      get "/dashboard/devices"
+
+      expect(response.body).to include('id="confirm-delete-modal"')
+      expect(response.body).to include('data-action="click-&gt;confirm-delete#show"').or include('data-action="click->confirm-delete#show"')
+      expect(response.body).to include("data-delete-url=\"#{dashboard_device_path(device)}\"")
+      expect(response.body).to include("Confirm Delete")
+      expect(response.body).not_to include("turbo_confirm")
+      expect(response.body).not_to include("turbo-confirm")
+    end
+
     context "when not logged in" do
       before { delete "/logout" }
 
@@ -101,6 +113,21 @@ RSpec.describe "Dashboard::Devices", type: :request do
 
       expect(response.body).to include("Device Attributes")
       expect(response.body).to include("No attributes yet")
+    end
+
+    it "renders delete-confirmation modals for the device and its attributes instead of browser confirm dialogs" do
+      device = Device.create!(name: "Living Room Plug", type: :smart_plug)
+      attribute = DeviceAttribute.create!(device: device, key: "power_w", value: "12.5")
+      get "/dashboard/devices/#{device.id}"
+
+      expect(response.body).to include('id="confirm-delete-modal"')
+      expect(response.body).to include('id="confirm-delete-attribute-modal"')
+      expect(response.body).to include("data-delete-url=\"#{dashboard_device_path(device)}\"")
+      expect(response.body).to include(
+        "data-delete-url=\"#{dashboard_device_device_attribute_path(device, attribute)}\""
+      )
+      expect(response.body).not_to include("turbo_confirm")
+      expect(response.body).not_to include("turbo-confirm")
     end
   end
 

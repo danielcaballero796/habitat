@@ -9,8 +9,7 @@
   <td class="actions">
     <%= link_to "View", dashboard_device_path(device), class: "btn btn-sm btn-secondary" %>
     <%= link_to "Edit", edit_dashboard_device_path(device), class: "btn btn-sm btn-warning" %>
-    <%= button_to "Delete", dashboard_device_path(device), method: :delete,
-        class: "btn btn-sm btn-danger",
-        form: { data: { turbo_confirm: "Are you sure? This will delete the device and all its attributes." } } %>
+    <%= link_to "Delete", "#", class: "btn btn-sm btn-danger",
+        data: { action: "click->confirm-delete#show", delete_url: dashboard_device_path(device), delete_name: device.name } %>
   </td>
 </tr>

@@ -1,13 +1,16 @@
 <div class="dashboard-container device-detail">
-  <header class="dashboard-header d-flex justify-content-between align-items-center">
+  <header class="dashboard-header d-flex justify-content-between align-items-center" data-controller="confirm-delete">
     <h1><%= @device.name %></h1>
     <div class="actions">
       <%= link_to "Back", dashboard_devices_path, class: "btn btn-secondary" %>
       <%= link_to "Edit", edit_dashboard_device_path(@device), class: "btn btn-warning" %>
-      <%= button_to "Delete", dashboard_device_path(@device), method: :delete,
-          class: "btn btn-danger",
-          form: { data: { turbo_confirm: "Are you sure? This will delete the device and all its attributes." } } %>
+      <%= link_to "Delete", "#", class: "btn btn-danger",
+          data: { action: "click->confirm-delete#show", delete_url: dashboard_device_path(@device), delete_name: @device.name } %>
     </div>
+
+    <%= render layout: "shared/modal", locals: { id: "confirm-delete-modal", title: "Confirm Delete", data: { "confirm-delete-target": "modal" } } do %>
+      <%= render "delete_confirmation" %>
+    <% end %>
   </header>
 
   <div id="flash"><%= render "shared/flash", message: flash[:notice] %></div>
@@ -25,7 +28,7 @@
     <p><strong>Notes:</strong> <%= @device.notes %></p>
   </div>
 
-  <div class="attributes-section">
+  <div class="attributes-section" data-controller="confirm-delete">
     <header class="d-flex justify-content-between align-items-center">
       <h3>Device Attributes</h3>
       <%= link_to "+ Add Attribute", new_dashboard_device_device_attribute_path(@device), class: "btn btn-primary", data: { action: "click->modal#open" } %>
@@ -42,7 +45,7 @@
       </thead>
       <tbody id="attributes-list">
         <% if @device.device_attributes.any? %>
-          <%= render @device.device_attributes %>
+          <%= render partial: "dashboard/device_attributes/attribute", collection: @device.device_attributes, as: :attribute %>
         <% else %>
           <tr id="no-attributes-row">
             <td colspan="4" class="empty-state">
@@ -56,6 +59,10 @@
 
     <%= render layout: "shared/modal", locals: { id: "attribute-modal", title: "Add Attribute" } do %>
       <%= render "dashboard/device_attributes/form", device: @device, attribute: DeviceAttribute.new %>
+    <% end %>
+
+    <%= render layout: "shared/modal", locals: { id: "confirm-delete-attribute-modal", title: "Confirm Delete", data: { "confirm-delete-target": "modal" } } do %>
+      <%= render "dashboard/device_attributes/delete_confirmation" %>
     <% end %>
   </div>
 </div>

@@ -480,7 +480,7 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 **Why**: Tie together modals, forms, Turbo responses.
 
-### Task 6.1: Create delete confirmation modals for devices & attributes
+### Task 6.1: Create delete confirmation modals for devices & attributes — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/devices/_delete_confirmation.html.erb -->
@@ -492,9 +492,30 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 **Testable**: Click delete → modal shows → confirm/cancel buttons work.
 
+**Implementation note**: Replaced `data-turbo-confirm` on devices index/show and
+attribute rows with real modal-based confirmations (`#confirm-delete-modal` on
+devices index/show, `#confirm-delete-attribute-modal` on the show page's
+attributes section — two distinct ids since a device show page contains both a
+device-delete and multiple attribute-delete contexts on the same DOM). Added a
+new `app/javascript/controllers/confirm_delete_controller.js` (`data-controller="confirm-delete"`,
+scoped on an ancestor wrapping both the trigger links and their modal) that
+copies `data-delete-url`/`data-delete-name` from the clicked trigger onto the
+confirmation form's action and name placeholder before opening the modal —
+needed because a single modal is shared across N table rows. Updated
+`shared/_modal.html.erb` to accept an optional `data:` local so callers can
+merge `data-confirm-delete-target="modal"` onto the overlay div.
+`Dashboard::DeviceAttributesController#destroy`'s `close_modal` target was
+corrected from the (colliding) generic `"confirm-delete-modal"` to
+`"confirm-delete-attribute-modal"`. Also fixed a latent bug found by this
+work: `show.html.erb` rendered `@device.device_attributes` via Rails' default
+collection partial lookup, which looks for `_device_attribute.html.erb`
+(doesn't exist) instead of the actual `_attribute.html.erb` partial — this was
+previously masked because no spec exercised the show page with attributes
+present; fixed via an explicit `render partial:` call.
+
 ---
 
-### Task 6.2: Add button styling & disable during submit
+### Task 6.2: Add button styling & disable during submit — [x] DONE
 
 ```erb
 <!-- In device form & attribute form -->
@@ -504,9 +525,13 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 
 **Testable**: Submit button disables & text changes during POST.
 
+**Implementation note**: Already present on both `devices/_form.html.erb` and
+`device_attributes/_form.html.erb` submit buttons since Phase 4/5 — verified,
+no changes needed.
+
 ---
 
-### Task 6.3: Create flash message partial (_flash.html.erb)
+### Task 6.3: Create flash message partial (_flash.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/shared/_flash.html.erb -->
@@ -516,6 +541,16 @@ how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
 ```
 
 **Testable**: Flash appears after action, disappears after 3s.
+
+**Implementation note**: `_flash.html.erb` existed (Phase 4, minimal). Added
+`data-controller="flash"` and a new `app/javascript/controllers/flash_controller.js`
+that calls `setTimeout(() => this.element.remove(), 3000)` on connect (works
+for both full-page-load flashes and Turbo Stream-inserted ones, since
+Stimulus `connect()` fires on every DOM attach). Bootstrap `alert alert-<type>`
+classes already applied (unstyled until Phase 8 adds the CDN, as expected).
+Auto-dismiss timing is not covered by request specs — no JS test driver in
+this repo (confirmed Phase 3) — flagged as manually-verifiable per task
+instructions, not blocking.
 
 ---
 
