@@ -1,0 +1,111 @@
+/* Reusable modal component styling (app/views/shared/_modal.html.erb).
+   Phase 8.2 — replaces the inline <style> block that lived in the partial
+   during Phase 3-7 with proper fade/scale animations.
+
+   IMPORTANT: this component intentionally does NOT use Bootstrap's JS modal
+   system, only a handful of Bootstrap's CSS utility classes (btn, table,
+   badge, etc.) elsewhere in the app. Bootstrap (loaded globally via CDN in
+   the layout) ships its OWN `.modal-backdrop` class with
+   `position: fixed; inset: 0; z-index: 1050` for its own JS modal component.
+   Our custom modal reuses the class name `.modal-backdrop` for an unrelated
+   "click outside to close" div — without the override below, Bootstrap's
+   rule would cover the full viewport and sit ABOVE `.modal-content` (which
+   would otherwise have no explicit z-index), swallowing every click inside
+   the modal, including the submit button. See also Phase 7 commit 1ad12e9. */
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  animation: modal-fade-in 0.2s ease forwards;
+}
+
+/* Reset of Bootstrap's own `.modal-backdrop` rule — see file header comment
+   for why this override is required. Kept as a plain, non-positioned,
+   non-stacked child so `.modal-content` (explicitly stacked above it)
+   receives clicks as expected. */
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: transparent;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 1;
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-16px) scale(0.98);
+  animation: modal-content-in 0.2s ease forwards;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.15s ease;
+}
+
+.modal-close:hover {
+  color: #111827;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

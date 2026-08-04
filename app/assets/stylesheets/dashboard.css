@@ -1,0 +1,95 @@
+/* Dashboard layout styling (Phase 8.3).
+   Targets the class names already present in app/views/dashboard/**/*.html.erb
+   (dashboard-container, dashboard-header, devices-table, attributes-table,
+   empty-state, actions, device-info, attributes-section) — no HTML/structural
+   changes needed, purely additive CSS on top of Bootstrap utility classes. */
+
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.dashboard-actions {
+  margin-bottom: 16px;
+}
+
+.devices-table,
+.attributes-table {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.devices-table th,
+.attributes-table th {
+  text-align: left;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.devices-table td,
+.attributes-table td {
+  vertical-align: middle;
+}
+
+.devices-table td.actions,
+.attributes-table td.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  text-align: center;
+  color: #6b7280;
+  padding: 32px 16px;
+}
+
+.device-detail .device-info {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0 32px;
+}
+
+.device-detail .device-info p {
+  margin: 4px 0;
+}
+
+.attributes-section {
+  margin-top: 32px;
+}
+
+.attributes-section header {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 576px) {
+  .dashboard-container {
+    padding: 16px 8px 32px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+
+  .devices-table td.actions,
+  .attributes-table td.actions {
+    flex-direction: column;
+  }
+}
