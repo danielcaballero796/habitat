@@ -4,6 +4,8 @@ RSpec.describe V1::LoginController, type: :controller do
   describe "POST #login" do
     let(:user) { User.create!(email: "admin@habitat.local", password: "secure123") }
 
+    before { user }
+
     context "with valid credentials" do
       it "returns a JWT token" do
         post :login, params: { email: "admin@habitat.local", password: "secure123" }

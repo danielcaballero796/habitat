@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe V1::DevicesController, type: :controller do
   let(:user) { User.create!(email: "admin@habitat.local", password: "secure123") }
-  let(:token) { JwtService.encode(user_id: user.id) }
-  let(:device) { Device.create!(name: "Smart TV", type: "entertainment", brand: "LG", model: "OLED55", room: "living_room", status: "active", ip_address: "192.168.1.100") }
+  let(:token) { JwtService.encode({ user_id: user.id }) }
+  let(:device) { Device.create!(name: "Smart TV", type: "smart_plug", brand: "LG", model: "OLED55", room: "living_room", status: "active", ip_address: "192.168.1.100") }
   let(:valid_params) do
     {
       name: "Smart Light",
-      type: "lighting",
+      type: "led_controller",
       brand: "Philips",
       model: "Hue",
       room: "bedroom",
@@ -39,7 +39,7 @@ RSpec.describe V1::DevicesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         get :index
@@ -63,7 +63,7 @@ RSpec.describe V1::DevicesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         get :show, params: { id: device.id }
@@ -78,7 +78,7 @@ RSpec.describe V1::DevicesController, type: :controller do
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
       expect(body["name"]).to eq "Smart Light"
-      expect(body["type"]).to eq "lighting"
+      expect(body["type"]).to eq "led_controller"
     end
 
     it "returns created device with serialized data" do
@@ -97,7 +97,7 @@ RSpec.describe V1::DevicesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         post :create, params: { device: valid_params }
@@ -125,7 +125,7 @@ RSpec.describe V1::DevicesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         patch :update, params: { id: device.id, device: { name: "Updated" } }
@@ -148,7 +148,7 @@ RSpec.describe V1::DevicesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         delete :destroy, params: { id: device.id }

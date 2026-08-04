@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe V1::DeviceAttributesController, type: :controller do
   let(:user) { User.create!(email: "admin@habitat.local", password: "secure123") }
-  let(:token) { JwtService.encode(user_id: user.id) }
-  let(:device) { Device.create!(name: "Smart TV", type: "entertainment", brand: "LG", model: "OLED55", room: "living_room", status: "active", ip_address: "192.168.1.100") }
+  let(:token) { JwtService.encode({ user_id: user.id }) }
+  let(:device) { Device.create!(name: "Smart TV", type: "smart_plug", brand: "LG", model: "OLED55", room: "living_room", status: "active", ip_address: "192.168.1.100") }
   let(:attribute) { device.device_attributes.create!(key: "brightness", value: "80") }
 
   before do
@@ -34,7 +34,7 @@ RSpec.describe V1::DeviceAttributesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         get :index, params: { device_id: device.id }
@@ -71,7 +71,7 @@ RSpec.describe V1::DeviceAttributesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         post :create, params: { device_id: device.id, device_attribute: { key: "brightness", value: "80" } }
@@ -105,7 +105,7 @@ RSpec.describe V1::DeviceAttributesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         patch :update, params: { device_id: device.id, id: attribute.id, device_attribute: { value: "50" } }
@@ -133,7 +133,7 @@ RSpec.describe V1::DeviceAttributesController, type: :controller do
     end
 
     context "without authentication" do
-      before { request.headers.delete("Authorization") }
+      before { request.headers["Authorization"] = nil }
 
       it "returns 401 Unauthorized" do
         delete :destroy, params: { device_id: device.id, id: attribute.id }
