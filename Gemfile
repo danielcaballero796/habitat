@@ -65,6 +65,22 @@ group :development, :test do
   gem "factory_bot_rails"
 end
 
+group :test do
+  # Browser-driven integration testing (system specs)
+  gem "capybara"
+
+  # Headless Chrome driver via CDP (Chrome DevTools Protocol) — no separate
+  # selenium-standalone container needed, talks directly to the chromium
+  # binary installed in the Docker image.
+  gem "cuprite"
+
+  # System specs run the Rails app in a real Puma server thread, which uses
+  # its own DB connection outside the test thread's open transaction — so
+  # the usual `use_transactional_fixtures` rollback is invisible to it.
+  # DatabaseCleaner truncates instead for `type: :system` specs only.
+  gem "database_cleaner-active_record"
+end
+
 group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"

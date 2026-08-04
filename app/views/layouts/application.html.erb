@@ -9,6 +9,11 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
+    <% if logged_in? %>
+      <nav class="d-flex justify-content-end p-2">
+        <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-outline-secondary btn-sm" %>
+      </nav>
+    <% end %>
     <%= yield %>
   </body>
 </html>

@@ -16,7 +16,13 @@ class SessionsController < ApplicationController
       redirect_to dashboard_path, notice: "Logged in successfully"
     else
       flash.now[:alert] = "Invalid email or password"
-      render :new
+      # Turbo Drive only renders a form response's body in place when the
+      # response is a redirect OR a non-2xx status; a bare 200 re-render
+      # (the implicit default here) is silently ignored, leaving the old
+      # page displayed. Every other form-backed controller in this app
+      # already uses :unprocessable_entity for the same reason (see
+      # Dashboard::DevicesController#create/#update).
+      render :new, status: :unprocessable_entity
     end
   end
 

@@ -1,7 +1,8 @@
 <div class="dashboard-container" data-controller="confirm-delete">
   <header class="dashboard-header d-flex justify-content-between align-items-center">
     <h1>Your Devices</h1>
-    <%= link_to "+ Add New Device", new_dashboard_device_path, class: "btn btn-primary", data: { action: "click->modal#open" } %>
+    <%= link_to "+ Add New Device", new_dashboard_device_path, class: "btn btn-primary",
+        data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#device-modal" } %>
   </header>
 
   <div id="flash"><%= render "shared/flash", message: flash[:notice] %></div>
@@ -22,7 +23,8 @@
         <tr id="no-devices-row">
           <td colspan="4" class="empty-state">
             You have no devices yet.
-            <%= link_to "Add one", new_dashboard_device_path, data: { action: "click->modal#open" } %>
+            <%= link_to "Add one", new_dashboard_device_path,
+                data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#device-modal" } %>
           </td>
         </tr>
       <% end %>

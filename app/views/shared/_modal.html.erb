@@ -8,7 +8,12 @@
                 overlay div (e.g. { "confirm-delete-target": "modal" }, used
                 by the confirm-delete Stimulus controller)
       content - block yielded as the modal body (form, confirmation text, etc.) %>
-<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal"<%= " #{tag.attributes(local_assigns[:data])}".html_safe if local_assigns[:data].present? %>>
+<%# `tag.attributes` renders hash keys as literal attribute names, so a raw
+    key like "confirm-delete-target" would render as
+    confirm-delete-target="modal" (missing the "data-" prefix Stimulus
+    requires to recognize it as a target) unless we prefix it ourselves. %>
+<% extra_data_attributes = (local_assigns[:data] || {}).transform_keys { |key| "data-#{key}" } %>
+<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal"<%= " #{tag.attributes(extra_data_attributes)}".html_safe if extra_data_attributes.present? %>>
   <div class="modal-backdrop" data-action="click->modal#closeOnBackdrop"></div>
   <div class="modal-content">
     <div class="modal-header">
@@ -43,7 +48,26 @@
     justify-content: center;
   }
 
+  /* Bootstrap (loaded globally via CDN in the layout) ships its OWN
+     `.modal-backdrop` class with `position: fixed; inset: 0; z-index: 1050`
+     for its own JS modal component. Our custom modal reuses the same class
+     name for an unrelated "click outside to close" div, so without this
+     override Bootstrap's rule makes it cover the full viewport and sit
+     ABOVE `.modal-content` (which has no explicit z-index, i.e. z-index:
+     auto within this stacking context) — swallowing every click inside the
+     modal, including the submit button. Reset it back to a plain
+     non-positioned, non-stacked child so `.modal-content` (explicitly
+     stacked above it) receives clicks as expected. */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: transparent;
+  }
+
   .modal-content {
+    position: relative;
+    z-index: 1;
     background: white;
     border-radius: 8px;
     width: 90%;

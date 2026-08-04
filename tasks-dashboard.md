@@ -569,11 +569,70 @@ instructions, not blocking.
 
 ---
 
-## Phase 7: Integration Tests (6 tasks)
+## Phase 7: Integration Tests (6 tasks) — [x] COMPLETE
 
 **Why**: Verify 36 spec scenarios pass. Test CRUD via Capybara + Turbo.
 
-### Task 7.1: Create login tests (spec/system/dashboard/login_spec.rb)
+**Implementation note**: Added a real JS-capable Capybara driver (Cuprite/Ferrum
+headless Chromium, `spec/rails_helper.rb`) since none existed before — all 6
+spec files below are genuine `type: :system` specs, not request specs.
+Chromium installed in the final Docker stage (`Dockerfile`). Writing real
+system specs surfaced several previously-undetectable bugs (no prior JS
+driver existed to catch them), all fixed as part of this phase:
+
+1. **Confirmed modal-trigger DOM-ancestor bug** (the reason this phase was
+   scoped to use a real browser): "+Add Device"/"+Add Attribute" open-modal
+   triggers used `data-action="click->modal#open"` while living OUTSIDE
+   their target modal's `data-controller="modal"` element — Stimulus
+   resolves actions via DOM ancestry, so the click silently did nothing.
+   Fixed with a new `modal_trigger_controller.js` using a Stimulus **outlet**
+   (`data-modal-trigger-modal-outlet="#device-modal"`) to reach across the
+   DOM tree to the target modal's own controller and call `.open()`
+   directly — the officially recommended Stimulus pattern for "trigger
+   outside the controlled element's subtree". The "Edit attribute" trigger
+   was intentionally left as a plain link (no JS), since `attribute-modal`
+   only ever renders the *new*-attribute form — wiring `modal#open` there
+   would have shown a blank form instead of the row's actual values.
+2. **Bootstrap `.modal-backdrop` class collision**: the custom modal
+   component's own `.modal-backdrop` div (click-outside-to-close) reused a
+   class name Bootstrap's CSS (loaded globally via CDN) also defines with
+   `position: fixed; inset: 0; z-index: 1050`, silently overlaying
+   `.modal-content` and swallowing every click inside every modal. Fixed by
+   resetting the class in `shared/_modal.html.erb`'s own `<style>` block.
+3. **Missing `data-` prefix on modal extra-data attributes**: `_modal.html.erb`
+   built extra `data-*` attributes via `tag.attributes(local_assigns[:data])`
+   without prefixing keys, so `{ "confirm-delete-target": "modal" }` rendered
+   as the literal (non-`data-`) attribute `confirm-delete-target="modal"`,
+   which Stimulus never sees — the delete-confirmation modal's `.open` class
+   was never applied. Fixed by prefixing keys before calling `tag.attributes`.
+4. **Missing `Rack::MethodOverride`**: `config.api_only = true` drops it from
+   the middleware stack. Every dashboard edit/update/destroy `<form>` submits
+   PATCH/DELETE via the standard Rails `_method` hidden field (browsers can't
+   send those verbs natively) — without the middleware, every such POST
+   404'd. Invisible to request specs (they call `patch`/`delete` directly,
+   bypassing the method-override mechanism entirely); only a real browser +
+   form submission exercises it. Added back in `config/application.rb`
+   alongside the already-manually-restored Cookies/Session middleware.
+5. **`SessionsController#create` missing `status: :unprocessable_entity`**:
+   the failed-login `render :new` had no explicit status (defaulting to 200).
+   Turbo Drive only renders a POST form response's body in place when it's a
+   redirect or a non-2xx status; a bare 200 re-render is silently ignored,
+   leaving the old page displayed. Every other form controller in this app
+   already used `:unprocessable_entity` for this reason — `SessionsController`
+   was the one inconsistent holdout, only surfaced by a real Turbo-driven
+   browser submission.
+6. Added a `Logout` link to `application.html.erb` (visible when
+   `logged_in?`) — required for spec 1.3 ("User can log out"); previously the
+   `DELETE /logout` route existed but no UI element triggered it anywhere.
+7. `DatabaseCleaner` (`:truncation` strategy) added for `type: :system` specs
+   only: the JS driver runs the Rails app in a real Puma server thread with
+   its own DB connection, invisible to the test thread's open transaction, so
+   the normal `use_transactional_fixtures` rollback silently failed to clean
+   up between system specs (symptom: `RecordInvalid: Email has already been
+   taken` on the 2nd example). Non-system specs keep the fast transactional
+   strategy.
+
+### Task 7.1: Create login tests (spec/system/dashboard/login_spec.rb) — [x] DONE
 
 ```ruby
 # - User can log in with valid credentials
@@ -586,7 +645,7 @@ instructions, not blocking.
 
 ---
 
-### Task 7.2: Create devices list tests (spec/system/dashboard/devices/list_spec.rb)
+### Task 7.2: Create devices list tests (spec/system/dashboard/devices/list_spec.rb) — [x] DONE
 
 ```ruby
 # - List view shows all devices
@@ -599,7 +658,7 @@ instructions, not blocking.
 
 ---
 
-### Task 7.3: Create device create tests (spec/system/dashboard/devices/create_spec.rb)
+### Task 7.3: Create device create tests (spec/system/dashboard/devices/create_spec.rb) — [x] DONE
 
 ```ruby
 # - Open "Add Device" modal
@@ -613,7 +672,7 @@ instructions, not blocking.
 
 ---
 
-### Task 7.4: Create device update tests (spec/system/dashboard/devices/update_spec.rb)
+### Task 7.4: Create device update tests (spec/system/dashboard/devices/update_spec.rb) — [x] DONE
 
 ```ruby
 # - Open edit modal
@@ -627,7 +686,7 @@ instructions, not blocking.
 
 ---
 
-### Task 7.5: Create device delete tests (spec/system/dashboard/devices/destroy_spec.rb)
+### Task 7.5: Create device delete tests (spec/system/dashboard/devices/destroy_spec.rb) — [x] DONE
 
 ```ruby
 # - Click delete button
@@ -640,7 +699,7 @@ instructions, not blocking.
 
 ---
 
-### Task 7.6: Create attribute CRUD tests (spec/system/dashboard/device_attributes_spec.rb)
+### Task 7.6: Create attribute CRUD tests (spec/system/dashboard/device_attributes_spec.rb) — [x] DONE
 
 ```ruby
 # - Create attribute: modal form, row added to table

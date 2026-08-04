@@ -35,5 +35,19 @@ module Habitat
     config.session_store :cookie_store, key: "_habitat_session"
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
+
+    # The dashboard's edit/update forms are real HTML <form> elements that
+    # submit PATCH/PUT/DELETE via the standard Rails `_method` hidden field
+    # (browsers can't natively send those verbs). Converting that back into
+    # the real HTTP method normally happens in `Rack::MethodOverride`, but
+    # API-only apps drop it along with the rest of the browser-oriented
+    # middleware stack — so every dashboard edit/update/destroy form was
+    # silently POSTing to a PATCH/DELETE-only route and getting a 404
+    # (only ever caught by a real browser + Capybara system spec, since
+    # request specs call `patch`/`delete` directly and never exercise the
+    # method-override path at all). Added back for the same reason
+    # Cookies/session were: the dashboard is a real HTML app layered on an
+    # otherwise API-only Rails config.
+    config.middleware.use Rack::MethodOverride
   end
 end

@@ -31,7 +31,8 @@
   <div class="attributes-section" data-controller="confirm-delete">
     <header class="d-flex justify-content-between align-items-center">
       <h3>Device Attributes</h3>
-      <%= link_to "+ Add Attribute", new_dashboard_device_device_attribute_path(@device), class: "btn btn-primary", data: { action: "click->modal#open" } %>
+      <%= link_to "+ Add Attribute", new_dashboard_device_device_attribute_path(@device), class: "btn btn-primary",
+          data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#attribute-modal" } %>
     </header>
 
     <table class="table attributes-table">
@@ -50,7 +51,8 @@
           <tr id="no-attributes-row">
             <td colspan="4" class="empty-state">
               No attributes yet.
-              <%= link_to "Add one", new_dashboard_device_device_attribute_path(@device), data: { action: "click->modal#open" } %>
+              <%= link_to "Add one", new_dashboard_device_device_attribute_path(@device),
+                  data: { controller: "modal-trigger", action: "click->modal-trigger#open", "modal-trigger-modal-outlet": "#attribute-modal" } %>
             </td>
           </tr>
         <% end %>

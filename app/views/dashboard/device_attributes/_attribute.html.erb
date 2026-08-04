@@ -3,7 +3,14 @@
   <td><%= attribute.value %></td>
   <td><%= attribute.updated_at %></td>
   <td class="actions">
-    <%= link_to "Edit", edit_dashboard_device_device_attribute_path(attribute.device, attribute), class: "btn btn-sm btn-warning", data: { action: "click->modal#open" } %>
+    <%# NOTE: intentionally no modal#open action here — the attribute-modal
+        on this page only ever renders the "new attribute" form, so opening
+        it in place for Edit would show a blank form instead of this row's
+        values. This link falls through to its plain href, doing a full
+        page navigation to the dedicated edit page (which renders the
+        attribute-modal pre-filled and already open), same pattern as the
+        device Edit link in devices/_device.html.erb. %>
+    <%= link_to "Edit", edit_dashboard_device_device_attribute_path(attribute.device, attribute), class: "btn btn-sm btn-warning" %>
     <%= link_to "Delete", "#", class: "btn btn-sm btn-danger",
         data: {
           action: "click->confirm-delete#show",

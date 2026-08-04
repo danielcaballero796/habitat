@@ -34,7 +34,14 @@ RSpec.describe "Sessions", type: :request do
 
       it "re-renders the login form with an error message" do
         post "/login", params: { email: "admin@habitat.local", password: "wrongpassword" }
-        expect(response).to have_http_status(:ok)
+        # :unprocessable_entity (422), not 200: Turbo Drive only renders a
+        # form response's body in place when it's a redirect or a non-2xx
+        # status. A bare 200 re-render is silently ignored client-side,
+        # leaving the old page displayed — confirmed via a real browser
+        # system spec (spec/system/dashboard/login_spec.rb). Every other
+        # form-backed controller in this app already follows this
+        # convention (see Dashboard::DevicesController#create/#update).
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to include("Invalid email or password")
       end
     end
