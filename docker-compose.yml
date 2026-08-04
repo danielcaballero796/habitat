@@ -24,6 +24,7 @@ services:
   app:
     build: .
     container_name: habitat_app
+    user: root
     command: rails server -b 0.0.0.0
     environment:
       DATABASE_URL: postgresql://habitat:habitat_dev@db:5432/habitat_development
@@ -31,11 +32,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      # Mount the entire project for live code reloading
-      - .:/habitat
+      # Mount the entire project for live code reloading (must match Dockerfile WORKDIR)
+      - .:/rails
       # Exclude node_modules and bundle (host versions not needed)
-      - /habitat/node_modules
-      - /habitat/vendor/bundle
+      - /rails/node_modules
+      - /rails/vendor/bundle
     depends_on:
       db:
         condition: service_healthy
