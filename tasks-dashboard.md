@@ -82,11 +82,11 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-## Phase 2: Dashboard Home Page (3 tasks)
+## Phase 2: Dashboard Home Page (3 tasks) — [x] COMPLETE
 
 **Why**: Landing page after login; lists all devices.
 
-### Task 2.1: Create DashboardController
+### Task 2.1: Create DashboardController — [x] DONE
 
 ```ruby
 # app/controllers/dashboard_controller.rb
@@ -102,7 +102,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 2.2: Create dashboard home view (dashboard/index.html.erb)
+### Task 2.2: Create dashboard home view (dashboard/index.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/index.html.erb -->
@@ -116,7 +116,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 2.3: Add dashboard route
+### Task 2.3: Add dashboard route — [x] DONE
 
 ```ruby
 # config/routes.rb
