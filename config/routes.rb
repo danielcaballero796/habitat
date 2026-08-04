@@ -16,4 +16,11 @@ Rails.application.routes.draw do
   delete '/logout', to: 'sessions#destroy', as: :logout
 
   get '/dashboard', to: 'dashboard#index', as: :dashboard
+
+  # NOTE: config.api_only = true (see config/application.rb) makes `resources`
+  # exclude :new and :edit by default (API apps don't render HTML forms), so
+  # the dashboard's device routes list every action explicitly.
+  namespace :dashboard do
+    resources :devices, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+  end
 end

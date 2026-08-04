@@ -1,0 +1,16 @@
+<tr id="device-<%= device.id %>">
+  <td><strong><%= device.name %></strong></td>
+  <td><%= device.type %></td>
+  <td>
+    <% if device.status.present? %>
+      <span class="badge bg-secondary"><%= device.status %></span>
+    <% end %>
+  </td>
+  <td class="actions">
+    <%= link_to "View", dashboard_device_path(device), class: "btn btn-sm btn-secondary" %>
+    <%= link_to "Edit", edit_dashboard_device_path(device), class: "btn btn-sm btn-warning" %>
+    <%= button_to "Delete", dashboard_device_path(device), method: :delete,
+        class: "btn btn-sm btn-danger",
+        form: { data: { turbo_confirm: "Are you sure? This will delete the device and all its attributes." } } %>
+  </td>
+</tr>

@@ -2,8 +2,10 @@
     Locals:
       id      - unique DOM id for the modal overlay (e.g. "device-modal")
       title   - heading text shown in the modal header
+      open    - optional; when true, the modal renders already visible
+                (used for full-page navigations to /new and /edit)
       content - block yielded as the modal body (form, confirmation text, etc.) %>
-<div id="<%= id %>" class="modal-overlay" data-controller="modal">
+<div id="<%= id %>" class="modal-overlay<%= " open" if local_assigns[:open] %>" data-controller="modal">
   <div class="modal-backdrop" data-action="click->modal#closeOnBackdrop"></div>
   <div class="modal-content">
     <div class="modal-header">

@@ -209,11 +209,33 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-## Phase 4: Devices List & CRUD Views (10 tasks)
+## Phase 4: Devices List & CRUD Views (9 tasks) — [x] COMPLETE
 
 **Why**: Core dashboard feature. Build list view first, then forms.
 
-### Task 4.1: Create Dashboard::DevicesController
+**Implementation note (/dashboard vs /dashboard/devices)**: `/dashboard`
+(Phase 2, unchanged) stays a lightweight, read-only landing page — it still
+passes its original Phase 2 request specs verbatim. `/dashboard/devices`
+(this phase) is the fully functional CRUD surface with working
+create/show/edit/update/destroy actions and Turbo Stream responses. They are
+intentionally not merged, to avoid touching/breaking the already-tested
+Phase 2 view. A "+ Add New Device" link on `/dashboard/devices` is the entry
+point into the CRUD flow; wiring a nav link from `/dashboard` itself is left
+to Phase 6 (Modal Integration & Forms) which ties the pages together.
+
+**Deviation from design doc**: `config.api_only = true` (see
+`config/application.rb`) makes Rails' `resources` macro exclude `:new` and
+`:edit` routes by default (API-only apps don't render HTML forms). Fixed by
+declaring `resources :devices, only: [:index, :show, :new, :create, :edit, :update, :destroy]`
+explicitly in `config/routes.rb`. Also, `turbo_stream.action(:close_modal, "#device-modal")`
+as written in the design doc produces `target="#device-modal"`, which Turbo
+resolves client-side via `document.getElementById(this.target)` — the literal
+`#` would never match a real element id. Implemented as
+`turbo_stream.action(:close_modal, "device-modal")` (no `#`) instead, matching
+how the `close_modal` custom Turbo Stream action (Phase 3) actually resolves
+`targetElements`.
+
+### Task 4.1: Create Dashboard::DevicesController — [x] DONE
 
 ```ruby
 # app/controllers/dashboard/devices_controller.rb
@@ -228,7 +250,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.2: Create devices list view (dashboard/devices/index.html.erb)
+### Task 4.2: Create devices list view (dashboard/devices/index.html.erb) — [x] DONE
 
 ```erb
 <!-- Simplified version (full view in task 4.3) -->
@@ -242,7 +264,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.3: Create device card partial (dashboard/devices/_device.html.erb)
+### Task 4.3: Create device card partial (dashboard/devices/_device.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/devices/_device.html.erb -->
@@ -256,7 +278,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.4: Create device new form modal (dashboard/devices/new.html.erb)
+### Task 4.4: Create device new form modal (dashboard/devices/new.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/devices/new.html.erb -->
@@ -269,7 +291,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.5: Create device form partial (dashboard/devices/_form.html.erb)
+### Task 4.5: Create device form partial (dashboard/devices/_form.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/devices/_form.html.erb -->
@@ -284,7 +306,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.6: Implement create action (POST /dashboard/devices)
+### Task 4.6: Implement create action (POST /dashboard/devices) — [x] DONE
 
 ```ruby
 # In Dashboard::DevicesController#create
@@ -303,7 +325,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.7: Create device show view (dashboard/devices/show.html.erb)
+### Task 4.7: Create device show view (dashboard/devices/show.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/dashboard/devices/show.html.erb -->
@@ -318,7 +340,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.8: Implement update action (PATCH /dashboard/devices/:id)
+### Task 4.8: Implement update action (PATCH /dashboard/devices/:id) — [x] DONE
 
 ```ruby
 # In Dashboard::DevicesController#update
@@ -337,7 +359,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 4.9: Implement delete action (DELETE /dashboard/devices/:id)
+### Task 4.9: Implement delete action (DELETE /dashboard/devices/:id) — [x] DONE
 
 ```ruby
 # In Dashboard::DevicesController#destroy

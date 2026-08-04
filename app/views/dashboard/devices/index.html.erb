@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+  <header class="dashboard-header d-flex justify-content-between align-items-center">
+    <h1>Your Devices</h1>
+    <%= link_to "+ Add New Device", new_dashboard_device_path, class: "btn btn-primary", data: { action: "click->modal#open" } %>
+  </header>
+
+  <div id="flash"><%= render "shared/flash", message: flash[:notice] %></div>
+
+  <table class="table devices-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="devices-list">
+      <% if @devices.any? %>
+        <%= render @devices %>
+      <% else %>
+        <tr id="no-devices-row">
+          <td colspan="4" class="empty-state">
+            You have no devices yet.
+            <%= link_to "Add one", new_dashboard_device_path, data: { action: "click->modal#open" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= render layout: "shared/modal", locals: { id: "device-modal", title: "Add Device" } do %>
+    <%= render "form", device: Device.new %>
+  <% end %>
+</div>

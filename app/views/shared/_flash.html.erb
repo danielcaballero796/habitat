@@ -1,0 +1,8 @@
+<%# Renders a single flash/notice message. Used both for normal page loads
+    (flash[:notice]) and as a Turbo Stream update target (id="flash") after
+    create/update/destroy actions.
+    Locals:
+      message - the text to display (nil/blank renders nothing) %>
+<% if message.present? %>
+  <div class="alert alert-success" role="alert"><%= message %></div>
+<% end %>
