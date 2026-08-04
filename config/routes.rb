@@ -9,4 +9,9 @@ Rails.application.routes.draw do
       resources :device_attributes, only: [:index, :create, :update, :destroy]
     end
   end
+
+  # Session-based auth for the dashboard (separate from JWT API auth above).
+  get '/login', to: 'sessions#new', as: :login
+  post '/login', to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy', as: :logout
 end

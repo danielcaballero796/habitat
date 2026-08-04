@@ -9,11 +9,11 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-## Phase 1: Session Authentication & Login (5 tasks)
+## Phase 1: Session Authentication & Login (5 tasks) — [x] COMPLETE
 
 **Why this phase first**: Login is the gate to everything. Get session auth working before building dashboard views.
 
-### Task 1.1: Create SessionsController
+### Task 1.1: Create SessionsController — [x] DONE
 
 ```ruby
 # app/controllers/sessions_controller.rb
@@ -29,7 +29,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 1.2: Create app/helpers/sessions_helper.rb
+### Task 1.2: Create app/helpers/sessions_helper.rb — [x] DONE
 
 ```ruby
 # - current_user helper method (User.find_by(id: session[:user_id]))
@@ -41,7 +41,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 1.3: Add ApplicationController changes for session auth
+### Task 1.3: Add ApplicationController changes for session auth — [x] DONE
 
 ```ruby
 # app/controllers/application_controller.rb
@@ -55,7 +55,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 1.4: Create login view (sessions/new.html.erb)
+### Task 1.4: Create login view (sessions/new.html.erb) — [x] DONE
 
 ```erb
 <!-- app/views/sessions/new.html.erb -->
@@ -69,7 +69,7 @@ This document breaks the dashboard design into testable, 5-10 minute implementat
 
 ---
 
-### Task 1.5: Add routes for session auth
+### Task 1.5: Add routes for session auth — [x] DONE
 
 ```ruby
 # config/routes.rb

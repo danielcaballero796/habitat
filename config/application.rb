@@ -28,5 +28,12 @@ module Habitat
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # The dashboard uses session-based login (separate from the JWT auth used
+    # by the JSON API), so cookies/session support is added back manually on
+    # top of the API-only middleware stack.
+    config.session_store :cookie_store, key: "_habitat_session"
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use config.session_store, config.session_options
   end
 end
