@@ -90,4 +90,35 @@ RSpec.describe JwtService, type: :lib do
       end
     end
   end
+
+  describe ".secret" do
+    around do |example|
+      original_env_secret = ENV["JWT_SECRET"]
+      example.run
+    ensure
+      if original_env_secret.nil?
+        ENV.delete("JWT_SECRET")
+      else
+        ENV["JWT_SECRET"] = original_env_secret
+      end
+    end
+
+    it "uses credentials.jwt_secret when present" do
+      allow(Rails.application.credentials).to receive(:jwt_secret).and_return("from_credentials")
+      ENV["JWT_SECRET"] = "from_env"
+      expect(JwtService.secret).to eq "from_credentials"
+    end
+
+    it "falls back to ENV['JWT_SECRET'] when credentials.jwt_secret is nil" do
+      allow(Rails.application.credentials).to receive(:jwt_secret).and_return(nil)
+      ENV["JWT_SECRET"] = "from_env"
+      expect(JwtService.secret).to eq "from_env"
+    end
+
+    it "raises when neither credentials.jwt_secret nor ENV['JWT_SECRET'] is set" do
+      allow(Rails.application.credentials).to receive(:jwt_secret).and_return(nil)
+      ENV.delete("JWT_SECRET")
+      expect { JwtService.secret }.to raise_error(/Set JWT_SECRET/)
+    end
+  end
 end

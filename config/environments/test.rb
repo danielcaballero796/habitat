@@ -61,4 +61,9 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Rails request specs default to Host: www.example.com, which isn't a
+  # real host this app would ever be reachable at. Host authorization is a
+  # production concern; disable it for the test environment entirely.
+  config.hosts.clear
 end

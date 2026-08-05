@@ -7,7 +7,7 @@ services:
     container_name: habitat_postgres
     environment:
       POSTGRES_USER: habitat
-      POSTGRES_PASSWORD: habitat_dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-habitat_dev}
       POSTGRES_DB: habitat_development
     volumes:
       # Named volume for persistent data (survives container restarts)
@@ -24,10 +24,17 @@ services:
   app:
     build: .
     container_name: habitat_app
+    # Confirmed necessary, not a leftover: with this removed, the image's
+    # non-root `rails` user can't write to log/tmp on the bind-mounted
+    # project directory under Windows Docker Desktop (Errno::EACCES on
+    # server.pid / development.log), even though it owns those paths inside
+    # the image. Revisit if/when this ever runs on a non-Windows host.
     user: root
     command: rails server -b 0.0.0.0
     environment:
       RAILS_ENV: development
+      JWT_SECRET: dev_jwt_secret_change_me_in_production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
     ports:
       - "3000:3000"
     volumes:
@@ -39,6 +46,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
 
 volumes:
   postgres_data:

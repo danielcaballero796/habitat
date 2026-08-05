@@ -15,6 +15,9 @@ class JwtService
   private
 
   def self.secret
-    Rails.application.credentials.jwt_secret || ENV["JWT_SECRET"] || Rails.application.secret_key_base
+    Rails.application.credentials.jwt_secret || ENV.fetch("JWT_SECRET") do
+      raise "Set JWT_SECRET (or credentials.jwt_secret) — refusing to sign JWTs with " \
+            "secret_key_base, which is also used for session cookies and CSRF tokens."
+    end
   end
 end

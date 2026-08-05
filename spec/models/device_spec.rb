@@ -52,7 +52,9 @@ RSpec.describe Device, type: :model do
     end
 
     it "rejects invalid type enum values (Scenario 1.5)" do
-      # Rails enum raises ArgumentError on invalid enum assignment
+      # Rails enum raises ArgumentError on invalid enum assignment — this is
+      # the documented, contractual behavior that
+      # Dashboard::DevicesController#handle_invalid_type rescues.
       expect {
         Device.new(name: "Test", type: :invalid_type)
       }.to raise_error(ArgumentError)

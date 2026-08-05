@@ -57,6 +57,14 @@ and request-flow diagram before making structural changes.
   docker compose exec app bundle exec rspec spec/models/device_spec.rb
   docker compose exec app bundle exec rspec spec/system/dashboard/devices/create_spec.rb
   ```
+- `spec/rails_helper.rb` force-sets `ENV['RAILS_ENV'] = 'test'` (not `||=`):
+  `docker-compose.yml` sets `RAILS_ENV=development` on the `app` container
+  (so `rails server` boots correctly), and `docker compose exec` inherits
+  that for every process it runs, including `bundle exec rspec`. A plain
+  `||=` would silently never fire, running the whole suite against the
+  development environment (wrong database, `config.hosts` not cleared,
+  etc.) — so `docker compose exec app bundle exec rspec` as written above
+  is safe to run as-is; you do not need `-e RAILS_ENV=test`.
 - `spec/rails_helper.rb` disables Rails' transactional-fixtures wrapper
   (`use_transactional_fixtures = false`) and delegates all cleanup to
   `DatabaseCleaner`: transaction strategy for normal specs, **truncation**
@@ -73,19 +81,6 @@ and request-flow diagram before making structural changes.
 
 ## Known issues
 
-- **`403 Blocked hosts: www.example.com` in dashboard request specs**:
-  `spec/requests/dashboard_spec.rb` and every spec under
-  `spec/requests/dashboard/` currently fail with this error. It is an
-  `ActionDispatch::HostAuthorization` / test-environment host allowlist
-  issue — Rails request specs default to `www.example.com` as the request
-  host, and nothing in `config/environments/test.rb` currently permits it
-  (only `config/environments/production.rb` even mentions `config.hosts`,
-  commented out). **This is pre-existing and unrelated to app logic** — if
-  you're working on the dashboard and these specs fail, that is expected
-  going in, not something you broke. Do not "fix" it by weakening
-  controller logic. The system specs under `spec/system/dashboard/` are
-  unaffected (Capybara/Cuprite don't go through the same host-check path)
-  and are the more reliable signal for dashboard behavior in the meantime.
 - The dashboard's `flash` Stimulus auto-dismiss controller
   (`app/javascript/controllers/flash_controller.js`) has no JS-driver
   coverage in request specs by design — verify flash auto-dismiss timing

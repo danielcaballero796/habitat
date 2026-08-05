@@ -28,6 +28,7 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://habitat:habitat_dev@localhost:5432/habitat_test
+      JWT_SECRET: ci_jwt_secret_not_used_outside_this_workflow
 
     steps:
       - name: Checkout code

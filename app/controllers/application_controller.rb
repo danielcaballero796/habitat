@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
   include SessionsHelper
 
-  # The dashboard (session auth, HTML forms) needs CSRF protection; JSON API
-  # requests (JWT-authenticated, no session cookie) are exempt since they
-  # can't carry a CSRF token and don't rely on cookie-based auth.
-  protect_from_forgery with: :exception, unless: -> { request.format.json? }
+  # The dashboard (session auth, HTML forms) needs CSRF protection. JWT-based
+  # controllers (no session cookie) opt out explicitly via
+  # `skip_forgery_protection` rather than via a response-format heuristic.
+  protect_from_forgery with: :exception
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
