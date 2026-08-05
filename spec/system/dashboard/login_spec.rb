@@ -9,8 +9,8 @@ RSpec.describe "Dashboard login", type: :system do
     fill_in "Password", with: "secure123"
     click_button "Log In"
 
-    expect(page).to have_current_path("/dashboard")
-    expect(page).to have_content("Welcome, admin@habitat.local")
+    expect(page).to have_current_path("/dashboard/devices")
+    expect(page).to have_content("Your Devices")
   end
 
   it "shows an error and stays on the login page with invalid credentials" do
@@ -31,7 +31,7 @@ RSpec.describe "Dashboard login", type: :system do
 
   it "logs out and requires login again for the dashboard" do
     sign_in(user, password: "secure123")
-    expect(page).to have_current_path("/dashboard")
+    expect(page).to have_current_path("/dashboard/devices")
 
     click_button "Logout"
 

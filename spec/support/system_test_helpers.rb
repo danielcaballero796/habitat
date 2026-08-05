@@ -15,8 +15,9 @@ module SystemTestHelpers
     # follow-up `visit` can race ahead of that in-flight navigation and hit
     # the next page before the session cookie exists yet, landing back on
     # /login ("Please log in to continue") — an intermittent flake, not a
-    # real app bug. Block until the redirect to /dashboard is visible.
-    expect(page).to have_current_path("/dashboard")
+    # real app bug. Block until the redirect chain (/dashboard -> /dashboard/devices)
+    # has settled.
+    expect(page).to have_current_path("/dashboard/devices")
   end
 end
 
