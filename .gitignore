@@ -26,3 +26,6 @@
 bash.exe.stackdump
 
 /config/credentials/development.key
+
+# Local-only improvement notes (see IMPROVEMENTS.md) — not for the repo
+IMPROVEMENTS.md
