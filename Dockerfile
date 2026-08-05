@@ -28,22 +28,6 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
-# Ensure User migration exists (workaround for Windows Docker volume caching)
-RUN test -f db/migrate/20260804000001_create_users.rb || cat > db/migrate/20260804000001_create_users.rb << 'EOF'
-class CreateUsers < ActiveRecord::Migration[7.1]
-  def change
-    create_table :users do |t|
-      t.string :email, null: false
-      t.string :password_digest, null: false
-
-      t.timestamps
-    end
-
-    add_index :users, :email, unique: true
-  end
-end
-EOF
-
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 

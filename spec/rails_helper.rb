@@ -1,5 +1,12 @@
 require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
+# Force (not ||=): docker-compose.yml sets RAILS_ENV=development for the app
+# container so `rails server` boots correctly, and `docker compose exec`
+# inherits that for every process it runs — including `bundle exec rspec`.
+# A plain `||=` here would silently never fire, running the entire suite
+# against the development environment (wrong database, no config.hosts.clear,
+# etc.) unless every invocation remembered `-e RAILS_ENV=test`. Specs are
+# always test-environment, unconditionally.
+ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../config/environment', __dir__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'

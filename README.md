@@ -210,11 +210,10 @@ transactional rollback, because Puma runs the app under system specs on its
 own thread with its own DB connection, invisible to the test thread's open
 transaction (see the comment block in `spec/rails_helper.rb`).
 
-**Known issue**: `spec/requests/dashboard_spec.rb` and
-`spec/requests/dashboard/*_spec.rb` currently fail with
-`403 Blocked hosts: www.example.com` — an `ActionDispatch::HostAuthorization`
-/ test-host-config issue, not an app bug. See `CLAUDE.md` for details before
-assuming a change broke these.
+**Note**: `docker compose exec app bundle exec rspec` always runs against the
+`test` environment even though the `app` container itself runs in
+`development` — `spec/rails_helper.rb` force-sets `RAILS_ENV`. See
+`CLAUDE.md`'s testing conventions for why that's necessary.
 
 ## Directory structure
 
